@@ -27,7 +27,7 @@ class TranscriberFactory:
         """
         if transcriber_type == TranscriberType.WHISPER_FIREWORKS:
             return WhisperFireworksTranscriber(
-                api_key= "fw_3ZSi76TGkzXALg8KWc4kyzak" #os.getenv("FIREWORKS_API"), **kwargs
+                api_key = os.getenv("FIREWORKS_API"), **kwargs
             )
 
         raise ValueError(
