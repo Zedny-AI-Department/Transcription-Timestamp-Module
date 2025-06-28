@@ -31,28 +31,31 @@ class FileChunksTimestampPipeline:
         Returns:
             - List of ParagraphAlignment objects containing the start timestamps of each paragraph.
         """
-        print(
-            f"Processing {len(paragraphs)} paragraphs with audio of size {len(audio)} bytes using model {transcriber_model}"
-        )
-        if not paragraphs or not audio:
-            return []
+        try:
+            print(
+                f"Processing {len(paragraphs)} paragraphs with audio of size bytes using model {transcriber_model}"
+            )
+            if not paragraphs or not audio:
+                return []
 
-        transcribed_chunks = self.transcriber.transcribe_segments_timestamp(
-            audio=audio, model_name=transcriber_model
-        )
-        print(
-            f"Transcribed {len(transcribed_chunks)} segments from audio with model {transcriber_model}"
-        )
-        if not transcribed_chunks:
-            return []
-        paragraphs_timestamps = []
-        for paragraph in paragraphs:
-            alignment = self.aligner.align_paragraph_timestamp_with_segments(
-                paragraph, transcribed_chunks
+            transcribed_chunks = self.transcriber.transcribe_segments_timestamp(
+                audio=audio, model_name=transcriber_model
             )
             print(
-                f"Aligned paragraph : {alignment}"
+                f"Transcribed {len(transcribed_chunks)} segments from audio with model {transcriber_model}"
             )
-            paragraphs_timestamps.append(alignment)
-            print(f"len: {len(paragraphs_timestamps)}")
-        return paragraphs_timestamps
+            if not transcribed_chunks:
+                return []
+            paragraphs_timestamps = []
+            for paragraph in paragraphs:
+                alignment = self.aligner.align_paragraph_timestamp_with_segments(
+                    paragraph, transcribed_chunks
+                )
+                print(
+                    f"Aligned paragraph : {alignment}"
+                )
+                paragraphs_timestamps.append(alignment)
+                print(f"len: {len(paragraphs_timestamps)}")
+            return paragraphs_timestamps
+        except Exception as e:            
+            raise Exception(f"Error in get_paragraphs_timestamp: {str(e)}")
