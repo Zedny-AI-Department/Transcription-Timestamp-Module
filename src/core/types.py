@@ -6,7 +6,7 @@ class TranscriberType(str, Enum):
     Enum-like class for different transcription types.
     """
 
-    WHISPER_FIREWORKS = "whisper_fireworks"
+    FASTER_WHISPER = "faster_whisper"
 
 
 class AlignerType(str, Enum):
@@ -15,3 +15,15 @@ class AlignerType(str, Enum):
     """
 
     FUZZY_ALIGNER = "fuzzy_aligner"
+
+
+class FasterWhisperModel(str, Enum):
+    """
+    Enum-like class for different Faster Whisper models.
+    """
+
+    LARGE_V3 = "large-v3"
+    MEDIUM = "medium"
+    SMALL = "small"
+    TINY = "tiny"
+    BASE = "base"

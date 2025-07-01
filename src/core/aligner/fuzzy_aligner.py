@@ -39,6 +39,7 @@ class FuzzyAligner(AlignerInterface):
         # Find the most similar segment to the paragraph start with fuzzy matching
         paragraph_start = " ".join(paragraph.strip().split(" ")[:10] if paragraph.strip() else "")
         start_match: MatchChunk = self._get_similar_segment(paragraph_start, segments)
+        
         print(f"paragraph: {paragraph_start}, best match: {start_match}")
         # Find the most similar segment to the paragraph end with fuzzy matching
         paragraph_end = " ".join(paragraph.strip().split(" ")[-10:] if paragraph.strip() else "")

@@ -1,5 +1,5 @@
-from .whisper_fireworks import WhisperFireworksTranscriber
+from .faster_whisper import FasterWhisperTranscriber
 
 __all__ = [
-    "WhisperFireworksTranscriber",
+    "FasterWhisperTranscriber",
 ]
