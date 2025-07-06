@@ -11,15 +11,16 @@ class AlignerInterface(ABC):
     """
 
     @abstractmethod
-    def align_paragraph_timestamp_with_segments(
-        self, paragraph: str, segments: List[TranscribedChunk], **kwargs
+    def align_paragraph_with_chunks(
+        self, paragraph: str, chunks: List[TranscribedChunk], search_length: int = 10,  **kwargs
     ) -> ParagraphAlignment:
         """
         Align the given paragraph with audio segments timestamp.
         Args:
             - paragraph: The paragraph to align with audio segments.
-            - segments: List of audio segments with their timestamps.
+            - chunks: List of audio segments with their timestamps.
             - **kwargs: Additional arguments for alignment.
+            - search_length: Number of words to consider for fuzzy matching (default is 10).
         Return:
             - Start and End time of paragraph.
         """

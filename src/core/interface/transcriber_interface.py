@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import BinaryIO, List, Union
 
-from src.models import TranscribedChunk
+from src.models import SegmentTranscriptionModel, SegmentTranscriptionModelWithWords
 
 
 class TranscriberInterface(ABC):
@@ -12,7 +12,7 @@ class TranscriberInterface(ABC):
     @abstractmethod
     def transcribe_segments_timestamp(
         self, audio_path: Union[BinaryIO, str], **kwargs
-    ) -> List[TranscribedChunk]:
+    ) -> List[SegmentTranscriptionModel]:
         """
         Transcribe the given audio file with segments timestamp and return the transcription.
         Args:
@@ -24,11 +24,11 @@ class TranscriberInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def transcribe_words_timestamp(
+    def transcribe_segments_with_words_timestamp(
         self, audio_path: Union[BinaryIO, str], **kwargs
-    ) -> List[TranscribedChunk]:
+    ) -> SegmentTranscriptionModelWithWords:
         """
-        Transcribe the given audio file with words timestamp and return the transcription.
+        Transcribe the given audio file using Whisper Fireworks with segment-level timestamps and return the transcription.
         Args:
             - audio_path: path of audio file.
             - **args: Additional arguments for the transcription model.

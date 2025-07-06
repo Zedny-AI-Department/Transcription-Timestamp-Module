@@ -1,7 +1,8 @@
 from typing import BinaryIO, List, Union
+import uuid
 from faster_whisper import WhisperModel
 
-from src.models.transcription_models import TranscribedChunk
+from src.models import SegmentTranscriptionModel, SegmentTranscriptionModelWithWords, WordTranscriptionModel
 from src.core.interface.transcriber_interface import TranscriberInterface
 
 
@@ -18,7 +19,7 @@ class FasterWhisperTranscriber(TranscriberInterface):
 
     def transcribe_segments_timestamp(
         self, audio_path: Union[BinaryIO, str], **kwargs
-    ) -> List[TranscribedChunk]:
+    ) -> List[SegmentTranscriptionModel]:
         """
         Transcribe the given audio file using Whisper Fireworks with segment-level timestamps and return the transcription.
         Args:
@@ -33,9 +34,9 @@ class FasterWhisperTranscriber(TranscriberInterface):
                 word_timestamps=False,
                 **kwargs,
             )
-            print("********************")
             segments = [
-                TranscribedChunk(
+                SegmentTranscriptionModel(
+                    segment_id=str(segment.id),
                     text=segment.text,
                     start=segment.start,
                     end=segment.end,
@@ -46,11 +47,11 @@ class FasterWhisperTranscriber(TranscriberInterface):
         except Exception as e:
             raise Exception(f"Error during transcription: {str(e)}")
 
-    def transcribe_words_timestamp(
+    def transcribe_segments_with_words_timestamp(
         self, audio_path: Union[BinaryIO, str], **kwargs
-    ) -> List[TranscribedChunk]:
+    ) -> SegmentTranscriptionModelWithWords:
         """
-        Transcribe the given audio file using Whisper Fireworks with word-level timestamps and return the transcription.
+        Transcribe the given audio file using Whisper with segment-level and  word-level timestamps and return the transcription.
         Args:
             - audio_path: path of audio file.
             - **kwargs: Additional arguments for the transcription model.
@@ -63,14 +64,34 @@ class FasterWhisperTranscriber(TranscriberInterface):
                 word_timestamps=True,
                 **kwargs,
             )
-            segments = [
-                TranscribedChunk(
-                    text=segment.text,
-                    start=segment.start,
-                    end=segment.end,
+            print("start transcription..")
+            segments_timestamps = []
+            words_timestamps = []
+            for segment in segments:
+                print(f"{segment.id}: {segment.text}, {segment.start}, {segment.end}")
+                print("------------")
+                segments_timestamps.append(
+                    SegmentTranscriptionModel(
+                        id=str(segment.id),
+                        text=segment.text,
+                        start=segment.start,
+                        end=segment.end,
+                    )
                 )
-                for segment in segments
-            ]
-            return segments
+                for word in segment.words:
+                    words_timestamps.append(
+                        WordTranscriptionModel(
+                            id=str(uuid.uuid4()),
+                            segment_id=str(segment.id),
+                            text=word.word,
+                            start=word.start,
+                            end=word.end,
+                        )
+                    )
+
+            return SegmentTranscriptionModelWithWords(
+                segments=segments_timestamps,
+                words=words_timestamps,
+)
         except Exception as e:
             raise Exception(f"Error during transcription: {str(e)}")

@@ -3,7 +3,6 @@ import json
 from typing import List
 from typing_extensions import Annotated
 from fastapi import APIRouter, File, UploadFile, HTTPException
-from fastapi.params import Depends, Form
 from pydantic import BaseModel, Field
 
 from src.core.types import FasterWhisperModel, TranscriberType
@@ -12,12 +11,7 @@ from src.core.factory.transcriber_factory import TranscriberFactory
 from src.models.aligner_models import ParagraphAlignment
 from src.services import FileChunksTimestampService
 
-timestamp_router = APIRouter()
-
-
-class FormData(BaseModel):
-    paragraphs: List[str]
-
+paragraph_timestamp_router = APIRouter()
 
 
 class ParagraphsAlignmentResponse(BaseModel):
@@ -26,26 +20,25 @@ class ParagraphsAlignmentResponse(BaseModel):
     )
 
 
-@timestamp_router.post("/timestamp")
+@paragraph_timestamp_router.post("/paragraphs/timestamp")
 async def align_paragraphs_with_audio(
     paragraphs_file: UploadFile = File(...),
     video_file: UploadFile = File(...)
 ):
     try:
+        # Read paragraphs
         if not paragraphs_file.filename.endswith(".json"):
             raise HTTPException(status_code=400, detail="Only JSON files are allowed.")
-
-        # Read paragraphs
         paragraphs_content = await paragraphs_file.read()
         paragraphs_data = json.loads(paragraphs_content)
         paragraphs = paragraphs_data.get("paragraphs", [])
 
+        # Read video file
         if not paragraphs or not video_file:
             raise HTTPException(
                 status_code=400, detail="Paragraphs and audio file are required."
             )
         print(f"Received {len(paragraphs)} paragraphs for alignment.")
-        print(type(paragraphs))
         video_bytes = await video_file.read()
         binary_file = io.BytesIO(video_bytes)
 

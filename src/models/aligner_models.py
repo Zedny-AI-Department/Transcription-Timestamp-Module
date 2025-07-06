@@ -23,3 +23,9 @@ class ParagraphAlignment(BaseModel):
     )
     start: float = Field(..., description="Start time of the paragraph in seconds.")
     end: float = Field(..., description="End time of the paragraph in seconds.")
+    best_start_match: MatchChunk = Field(
+        ..., description="The best matching segment for the paragraph."
+    )
+    best_end_match: MatchChunk = Field(
+        ..., description="The best matching segment for the paragraph."
+    )
