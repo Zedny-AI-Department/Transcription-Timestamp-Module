@@ -1,6 +1,6 @@
 from src.core import AlignerInterface
 from src.core.types import AlignerType
-from src.core.aligner import FuzzyAligner
+from src.core.aligner import FuzzyAligner, FuzzyWuzzyAligner
 
 
 class AlignerFactory:
@@ -20,7 +20,9 @@ class AlignerFactory:
         """
         if aligner_type == AlignerType.FUZZY_ALIGNER:
             return FuzzyAligner(**kwargs)
-
-        raise ValueError(
-            f"Transcriber type must be one of: {[a.value for a in AlignerType]} but got {aligner_type}"
-        )
+        elif aligner_type == AlignerType.FUZZYWUZZY_ALIGNER:
+            return FuzzyWuzzyAligner(**kwargs)
+        else:
+            raise ValueError(
+                f"Transcriber type must be one of: {[a.value for a in AlignerType]} but got {aligner_type}"
+            )

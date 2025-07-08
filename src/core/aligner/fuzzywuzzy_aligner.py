@@ -1,15 +1,15 @@
 from typing import List
-from Levenshtein import ratio
+from fuzzywuzzy import fuzz
 
 from src.core import AlignerInterface
 from src.models import MatchChunk
-from src.models import TranscribedChunk, SegmentTranscriptionModel, WordTranscriptionModel
+from src.models import SegmentTranscriptionModel, WordTranscriptionModel
 from src.models import ParagraphAlignment
 
 
-class FuzzyAligner(AlignerInterface):
+class FuzzyWuzzyAligner(AlignerInterface):
     """
-    Fuzzy Aligner class for aligning audio transcriptions with timestamps.
+    FuzzyWuzzy Aligner class for aligning audio transcriptions with timestamps.
     This class implements the AlignerInterface and provides methods to align paragraphs with audio segments.
     """
 
@@ -78,7 +78,7 @@ class FuzzyAligner(AlignerInterface):
 
         # Find the most similar segment to the paragraph end with fuzzy matching
         paragraph_end = " ".join(paragraph.strip().split(" ")[-1:] if paragraph.strip() else "")
-        end_match: MatchChunk = self._get_similar_segment(paragraph_end, words)
+        end_match: MatchChunk = self._get_similar_word(paragraph_end, words)
 
         # Return the alignment with start and end times
         return ParagraphAlignment(
@@ -90,18 +90,18 @@ class FuzzyAligner(AlignerInterface):
         )
     
     def _get_similar_segment(self,
-        search_sentence: str, chunks: List[TranscribedChunk]
+        search_sentence: str, segments: List[SegmentTranscriptionModel]
     ) -> MatchChunk:
         """
         Find the most similar segment to the search sentence using fuzzy matching.
         Args:
             - search_sentence: The sentence to search for in the segments.
-            - chunks: List of audio segments to search within.
+            - segments: List of audio segments to search within.
         Return:
             - MatchChunk containing the most similar segment's text, start time, end time, and score.
         """
         # Validate inputs
-        if not chunks:
+        if not segments:
             return None
         if not search_sentence or search_sentence.strip() == "":
             return None
@@ -109,14 +109,14 @@ class FuzzyAligner(AlignerInterface):
         # Get the segment with the highest similarity score
         max_score = 0
         best_match = None
-        for segment in chunks:
+        for segment in segments:
             if segment and segment.text.strip() != "":
-                score = ratio(segment.text, search_sentence)
-                if score ==0 or score > max_score:
+                score = fuzz.partial_ratio(segment.text, search_sentence)
+                if score == 0 or score > max_score:
                     max_score = score
                     best_match = segment
         if not best_match:
-            print(f"No matching segment found.: {chunks}, search_sentence: {search_sentence}")
+            print(f"No matching segment found.: {segments}, search_sentence: {search_sentence}")
             return None
         return (
             MatchChunk(
@@ -124,6 +124,45 @@ class FuzzyAligner(AlignerInterface):
                 text=best_match.text,
                 start=best_match.start,
                 end=best_match.end,
-                score=max_score,
+                score=max_score / 100,
+            )
+        )
+
+    def _get_similar_word(self,
+        search_sentence: str, words: List[WordTranscriptionModel]
+    ) -> MatchChunk:
+        """
+        Find the most similar segment to the search sentence using fuzzy matching.
+        Args:
+            - search_sentence: The sentence to search for in the segments.
+            - words: List of audio segments to search within.
+        Return:
+            - MatchChunk containing the most similar segment's text, start time, end time, and score.
+        """
+        # Validate inputs
+        if not words:
+            return None
+        if not search_sentence or search_sentence.strip() == "":
+            return None
+
+        # Get the segment with the highest similarity score
+        max_score = 0
+        best_match = None
+        for segment in words:
+            if segment and segment.text.strip() != "":
+                score = fuzz.ratio(segment.text, search_sentence)
+                if score > max_score:
+                    max_score = score
+                    best_match = segment
+        if not best_match:
+            print(f"No matching segment found.: {words}, search_sentence: {search_sentence}")
+            return None
+        return (
+            MatchChunk(
+                id=best_match.id,
+                text=best_match.text,
+                start=best_match.start,
+                end=best_match.end,
+                score=max_score / 100,
             )
         )

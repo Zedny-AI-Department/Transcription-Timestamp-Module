@@ -12,4 +12,8 @@ python-multipart==0.0.20
 uvicorn==0.34.3
 levenshtein==0.27.1
 rapidfuzz==3.13.0
-
+imageio==2.37.0
+imageio-ffmpeg==0.6.0
+moviepy==2.2.1
+pillow==11.3.0
+proglog==0.1.12

@@ -15,6 +15,7 @@ class AlignerType(str, Enum):
     """
 
     FUZZY_ALIGNER = "fuzzy_aligner"
+    FUZZYWUZZY_ALIGNER = "fuzzywuzzy_aligner"
 
 
 class FasterWhisperModel(str, Enum):

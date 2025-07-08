@@ -41,8 +41,6 @@ class FileChunksTimestampService:
             transcribed_segments_with_words = (
                 self.transcriber.transcribe_segments_with_words_timestamp(
                     audio_path=audio,
-                    vad_filter=True,
-                    chunk_length=10
                 )
             )
 
@@ -52,7 +50,7 @@ class FileChunksTimestampService:
             paragraphs_timestamps = []
             for paragraph in paragraphs:
                 # Align the paragraph with audio segments timestamp
-                segment_alignment = self.aligner.align_paragraph_with_chunks(
+                segment_alignment = self.aligner.align_paragraph_with_segments(
                     paragraph, transcribed_segments_with_words.segments
                 )
                 print(f"segment alignment: {segment_alignment}")
@@ -68,10 +66,9 @@ class FileChunksTimestampService:
                     print(
                         f"length of start_segment_words: {len(start_segment_words)}: {start_segment_words}"
                     )
-                    paragraph_start_word = self.aligner.align_paragraph_with_chunks(
+                    paragraph_start_word = self.aligner.align_paragraph_with_words(
                         paragraph=paragraph,
-                        chunks=start_segment_words,
-                        search_length=1,
+                        words=start_segment_words,
                     )
                     print(f"paragraph_start_word: {type(paragraph_start_word)}: {paragraph_start_word}")
                     paragraph_start = (
@@ -86,8 +83,8 @@ class FileChunksTimestampService:
                         if str(word.segment_id)
                         == str(segment_alignment.best_end_match.id)
                     ]
-                    paragraph_end_word = self.aligner.align_paragraph_with_chunks(
-                        paragraph=paragraph, chunks=end_segments_words, search_length=1
+                    paragraph_end_word = self.aligner.align_paragraph_with_words(
+                        paragraph=paragraph, words=end_segments_words
                     )
                     print(f"paragraph_end_word: {type(paragraph_end_word)}: {paragraph_end_word}")
                     paragraph_end = (
