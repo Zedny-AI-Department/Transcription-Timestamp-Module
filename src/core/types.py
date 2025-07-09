@@ -28,3 +28,9 @@ class FasterWhisperModel(str, Enum):
     SMALL = "small"
     TINY = "tiny"
     BASE = "base"
+
+
+
+# Defaults
+
+DEFAULT_SEARCH_SEGMENT_SIZE: int = 8

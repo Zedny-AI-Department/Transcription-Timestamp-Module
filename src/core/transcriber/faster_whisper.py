@@ -37,7 +37,7 @@ class FasterWhisperTranscriber(TranscriberInterface):
             segments = [
                 SegmentTranscriptionModel(
                     segment_id=str(segment.id),
-                    text=segment.text,
+                    text=segment.text.strip(),
                     start=segment.start,
                     end=segment.end,
                 )
@@ -73,7 +73,7 @@ class FasterWhisperTranscriber(TranscriberInterface):
                 segments_timestamps.append(
                     SegmentTranscriptionModel(
                         id=str(segment.id),
-                        text=segment.text,
+                        text=segment.text.strip(),
                         start=segment.start,
                         end=segment.end,
                     )

@@ -60,38 +60,33 @@ class FileChunksTimestampService:
                     start_segment_words = [
                         word
                         for word in transcribed_segments_with_words.words
-                        if str(word.segment_id)
-                        == str(segment_alignment.best_start_match.id)
+                        if str(word.segment_id) == str(segment_alignment.best_start_match.id)
                     ]
-                    print(
-                        f"length of start_segment_words: {len(start_segment_words)}: {start_segment_words}"
-                    )
                     paragraph_start_word = self.aligner.align_paragraph_with_words(
                         paragraph=paragraph,
                         words=start_segment_words,
                     )
-                    print(f"paragraph_start_word: {type(paragraph_start_word)}: {paragraph_start_word}")
                     paragraph_start = (
                         paragraph_start_word
                         if paragraph_start_word.best_start_match and paragraph_start_word.best_start_match.score > 0.5
                         else segment_alignment
                     )
-                    # Get the end word of the paragraph
-                    end_segments_words = [
+    
+                    # Get the start word of the paragraph
+                    end_segment_words = [
                         word
                         for word in transcribed_segments_with_words.words
-                        if str(word.segment_id)
-                        == str(segment_alignment.best_end_match.id)
+                        if str(word.segment_id) == str(segment_alignment.best_end_match.id)
                     ]
                     paragraph_end_word = self.aligner.align_paragraph_with_words(
-                        paragraph=paragraph, words=end_segments_words
+                        paragraph=paragraph, words=end_segment_words
                     )
-                    print(f"paragraph_end_word: {type(paragraph_end_word)}: {paragraph_end_word}")
                     paragraph_end = (
                         paragraph_end_word
                         if paragraph_end_word.best_end_match and paragraph_end_word.best_end_match.score > 0.5
                         else segment_alignment
                     )
+                    print("----------")
                     # Create a ParagraphAlignment object with the paragraph and its timestamps
                     paragraphs_timestamps.append(
                         ParagraphAlignment(

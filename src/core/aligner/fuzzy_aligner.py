@@ -1,6 +1,7 @@
 from typing import List
 from Levenshtein import ratio
 
+from src.core.types import DEFAULT_SEARCH_SEGMENT_SIZE
 from src.core import AlignerInterface
 from src.models import MatchChunk
 from src.models import TranscribedChunk, SegmentTranscriptionModel, WordTranscriptionModel
@@ -38,11 +39,11 @@ class FuzzyAligner(AlignerInterface):
             return None
 
         # Find the most similar segment to the paragraph start with fuzzy matching
-        paragraph_start = " ".join(paragraph.strip().split(" ")[:10] if paragraph.strip() else "")
+        paragraph_start = " ".join(paragraph.strip().split(" ")[:DEFAULT_SEARCH_SEGMENT_SIZE] if paragraph.strip() else "")
         start_match: MatchChunk = self._get_similar_segment(paragraph_start, segments)
 
         # Find the most similar segment to the paragraph end with fuzzy matching
-        paragraph_end = " ".join(paragraph.strip().split(" ")[-10:] if paragraph.strip() else "")
+        paragraph_end = " ".join(paragraph.strip().split(" ")[-DEFAULT_SEARCH_SEGMENT_SIZE:] if paragraph.strip() else "")
         end_match: MatchChunk = self._get_similar_segment(paragraph_end, segments)
 
         # Return the alignment with start and end times
@@ -73,11 +74,11 @@ class FuzzyAligner(AlignerInterface):
             return None
 
         # Find the most similar segment to the paragraph start with fuzzy matching
-        paragraph_start = " ".join(paragraph.strip().split(" ")[:1] if paragraph.strip() else "")
+        paragraph_start = paragraph.strip().split(" ")[0] if paragraph.strip() else ""
         start_match: MatchChunk = self._get_similar_segment(paragraph_start, words)
 
         # Find the most similar segment to the paragraph end with fuzzy matching
-        paragraph_end = " ".join(paragraph.strip().split(" ")[-1:] if paragraph.strip() else "")
+        paragraph_end = paragraph.strip().split(" ")[-1] if paragraph.strip() else ""
         end_match: MatchChunk = self._get_similar_segment(paragraph_end, words)
 
         # Return the alignment with start and end times
@@ -88,7 +89,7 @@ class FuzzyAligner(AlignerInterface):
             best_start_match=start_match,
             best_end_match=end_match
         )
-    
+
     def _get_similar_segment(self,
         search_sentence: str, chunks: List[TranscribedChunk]
     ) -> MatchChunk:
@@ -112,12 +113,10 @@ class FuzzyAligner(AlignerInterface):
         for segment in chunks:
             if segment and segment.text.strip() != "":
                 score = ratio(segment.text, search_sentence)
-                if score ==0 or score > max_score:
+                if max_score ==0 or score > max_score:
                     max_score = score
                     best_match = segment
-        if not best_match:
-            print(f"No matching segment found.: {chunks}, search_sentence: {search_sentence}")
-            return None
+
         return (
             MatchChunk(
                 id=best_match.id,
