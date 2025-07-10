@@ -41,8 +41,11 @@ class FileChunksTimestampService:
             transcribed_segments_with_words = (
                 self.transcriber.transcribe_segments_with_words_timestamp(
                     audio_path=audio,
+                    vad_filter=True,
+                    vad_parameters=dict(
+                        threshold=0.3,
                 )
-            )
+            ) )
 
             if not transcribed_segments_with_words:
                 return []
