@@ -1,5 +1,6 @@
+import io
 import json
-from typing import List, Optional
+from typing import BinaryIO, List, Optional
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from pydantic import BaseModel, Field
 
@@ -16,25 +17,27 @@ paragraph_timestamp_router = APIRouter()
 
 # Helper functions
 # Get the pipeline for the given transcriber and aligner types
-def get_pipeline(transcriber_type: Optional[str] = TranscriberType.FASTER_WHISPER,
-                transcribe_model: Optional[str] = FasterWhisperModel.LARGE_V3,
-                aligner_type: Optional[str] = AlignerType.FUZZYWUZZY_ALIGNER):
+def get_pipeline(
+    transcriber_type: Optional[str] = TranscriberType.MODAL_WHISPER,
+    transcribe_model: Optional[str] = FasterWhisperModel.LARGE_V3,
+    aligner_type: Optional[str] = AlignerType.FUZZYWUZZY_ALIGNER,
+):
     try:
         transcriber = TranscriberFactory.get_transcriber(
-                transcriber_type=transcriber_type,
-                model_name=transcribe_model,
-            )
-        
+            transcriber_type=transcriber_type,
+            model_name=transcribe_model,
+        )
+
         aligner = AlignerFactory.get_aligner(aligner_type=aligner_type)
-        
+
         pipeline = FileChunksTimestampService(
-                transcriber=transcriber,
-                aligner=aligner,
-            )
+            transcriber=transcriber,
+            aligner=aligner,
+        )
         return pipeline
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Internal server error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
 
 # Function to extract paragraphs from a JSON file
 async def extract_paragraphs_from_json(paragraphs_file: UploadFile):
@@ -52,8 +55,8 @@ async def extract_paragraphs_from_json(paragraphs_file: UploadFile):
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 
-
 # Response model
+
 
 class ParagraphsAlignmentResponse(BaseModel):
     result: List[ParagraphAlignment] = Field(
@@ -63,10 +66,10 @@ class ParagraphsAlignmentResponse(BaseModel):
 
 # Endpoints
 
+
 @paragraph_timestamp_router.post("/align")
 async def align_paragraphs_with_audio(
-    paragraphs_file: UploadFile = File(...),
-    media_file: UploadFile = File(...)
+    paragraphs_file: UploadFile = File(...), media_file: UploadFile = File(...)
 ):
     try:
         media_file_bytes = await media_file.read()
@@ -77,18 +80,22 @@ async def align_paragraphs_with_audio(
         mimetypes = detect_file_type(file_bytes=media_file_bytes)
         if not mimetypes.startswith("video/") and not mimetypes.startswith("audio/"):
             raise HTTPException(
-                status_code=400, detail="Invalid file format. Please upload a video or audio file.")
+                status_code=400,
+                detail="Invalid file format. Please upload a video or audio file.",
+            )
         elif mimetypes.startswith("video/"):
-            binary_audio = await convert_video_to_audio(video_bytes=media_file_bytes, video_name=media_file.filename)  
+            binary_audio = await convert_video_to_audio(
+                video_bytes=media_file_bytes, video_name=media_file.filename
+            )
         else:
-            binary_audio = media_file_bytes          
-
+            binary_audio = io.BytesIO(media_file_bytes)
 
         # Prepare paragraphs
         paragraphs = await extract_paragraphs_from_json(paragraphs_file=paragraphs_file)
         if not paragraphs:
-            raise HTTPException(status_code=400, detail="No paragraphs found in the JSON file.")
-        print(f"Received {len(paragraphs)} paragraphs for alignment.")
+            raise HTTPException(
+                status_code=400, detail="No paragraphs found in the JSON file."
+            )
 
         # Create pipeline
         pipeline = get_pipeline()
