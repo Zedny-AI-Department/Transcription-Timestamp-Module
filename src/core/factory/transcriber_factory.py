@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 from src.core import TranscriberInterface
 from src.core.types import TranscriberType
-from src.core.transcriber import FasterWhisperTranscriber
+from src.core.transcriber import FasterWhisperTranscriber, ModalFasterWhisperTranscriber
 
 # Load environment variables from .env file
 load_dotenv()
@@ -29,7 +29,8 @@ class TranscriberFactory:
         """
         if transcriber_type == TranscriberType.FASTER_WHISPER:
             return FasterWhisperTranscriber(model_name=model_name, **kwargs)
-
+        elif transcriber_type == TranscriberType.MODAL_WHISPER:
+            return ModalFasterWhisperTranscriber(model_name=model_name, **kwargs)
         raise ValueError(
             f"Transcriber type must be one of: {[t.value for t in TranscriberType]} but got {transcriber_type}"
         )

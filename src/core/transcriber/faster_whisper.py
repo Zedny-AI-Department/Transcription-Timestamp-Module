@@ -2,7 +2,11 @@ from typing import BinaryIO, List, Union
 import uuid
 from faster_whisper import WhisperModel
 
-from src.models import SegmentTranscriptionModel, SegmentTranscriptionModelWithWords, WordTranscriptionModel
+from src.models import (
+    SegmentTranscriptionModel,
+    SegmentTranscriptionModelWithWords,
+    WordTranscriptionModel,
+)
 from src.core.interface.transcriber_interface import TranscriberInterface
 
 
@@ -64,12 +68,9 @@ class FasterWhisperTranscriber(TranscriberInterface):
                 word_timestamps=True,
                 **kwargs,
             )
-            print("start transcription..")
             segments_timestamps = []
             words_timestamps = []
             for segment in segments:
-                print(f"{segment.id}: {segment.text}, {segment.start}, {segment.end}")
-                print("------------")
                 segments_timestamps.append(
                     SegmentTranscriptionModel(
                         id=str(segment.id),
@@ -92,6 +93,6 @@ class FasterWhisperTranscriber(TranscriberInterface):
             return SegmentTranscriptionModelWithWords(
                 segments=segments_timestamps,
                 words=words_timestamps,
-)
+            )
         except Exception as e:
             raise Exception(f"Error during transcription: {str(e)}")

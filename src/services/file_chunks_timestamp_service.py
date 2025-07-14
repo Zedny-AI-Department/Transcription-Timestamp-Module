@@ -34,7 +34,6 @@ class FileChunksTimestampService:
             - List of ParagraphAlignment objects containing the start timestamps of each paragraph.
         """
         try:
-            print(f"start pipeline..")
             if not paragraphs or not audio:
                 return []
 
@@ -44,26 +43,26 @@ class FileChunksTimestampService:
                     vad_filter=True,
                     vad_parameters=dict(
                         threshold=0.3,
+                    ),
                 )
-            ) )
+            )
 
             if not transcribed_segments_with_words:
                 return []
-            print("transcription completed.")
             paragraphs_timestamps = []
             for paragraph in paragraphs:
                 # Align the paragraph with audio segments timestamp
                 segment_alignment = self.aligner.align_paragraph_with_segments(
                     paragraph, transcribed_segments_with_words.segments
                 )
-                print(f"segment alignment: {segment_alignment}")
                 # Align the paragraph with audio words timestamp
                 if segment_alignment:
                     # Get the start word of the paragraph
                     start_segment_words = [
                         word
                         for word in transcribed_segments_with_words.words
-                        if str(word.segment_id) == str(segment_alignment.best_start_match.id)
+                        if str(word.segment_id)
+                        == str(segment_alignment.best_start_match.id)
                     ]
                     paragraph_start_word = self.aligner.align_paragraph_with_words(
                         paragraph=paragraph,
@@ -71,25 +70,27 @@ class FileChunksTimestampService:
                     )
                     paragraph_start = (
                         paragraph_start_word
-                        if paragraph_start_word.best_start_match and paragraph_start_word.best_start_match.score > 0.5
+                        if paragraph_start_word.best_start_match
+                        and paragraph_start_word.best_start_match.score > 0.5
                         else segment_alignment
                     )
-    
+
                     # Get the start word of the paragraph
                     end_segment_words = [
                         word
                         for word in transcribed_segments_with_words.words
-                        if str(word.segment_id) == str(segment_alignment.best_end_match.id)
+                        if str(word.segment_id)
+                        == str(segment_alignment.best_end_match.id)
                     ]
                     paragraph_end_word = self.aligner.align_paragraph_with_words(
                         paragraph=paragraph, words=end_segment_words
                     )
                     paragraph_end = (
                         paragraph_end_word
-                        if paragraph_end_word.best_end_match and paragraph_end_word.best_end_match.score > 0.5
+                        if paragraph_end_word.best_end_match
+                        and paragraph_end_word.best_end_match.score > 0.5
                         else segment_alignment
                     )
-                    print("----------")
                     # Create a ParagraphAlignment object with the paragraph and its timestamps
                     paragraphs_timestamps.append(
                         ParagraphAlignment(

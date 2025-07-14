@@ -7,6 +7,7 @@ class TranscriberType(str, Enum):
     """
 
     FASTER_WHISPER = "faster_whisper"
+    MODAL_WHISPER = "modal_whisper"
 
 
 class AlignerType(str, Enum):
@@ -28,7 +29,6 @@ class FasterWhisperModel(str, Enum):
     SMALL = "small"
     TINY = "tiny"
     BASE = "base"
-
 
 
 # Defaults
