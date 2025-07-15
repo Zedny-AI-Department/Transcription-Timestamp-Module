@@ -1,7 +1,7 @@
 import io
 import json
-from typing import BinaryIO, List, Optional
-from fastapi import APIRouter, File, UploadFile, HTTPException
+from typing import List, Literal, Optional
+from fastapi import APIRouter, File, Query, UploadFile, HTTPException
 from pydantic import BaseModel, Field
 
 from src.core.types import FasterWhisperModel, TranscriberType, AlignerType
@@ -69,7 +69,8 @@ class ParagraphsAlignmentResponse(BaseModel):
 
 @paragraph_timestamp_router.post("/align")
 async def align_paragraphs_with_audio(
-    paragraphs_file: UploadFile = File(...), media_file: UploadFile = File(...)
+    paragraphs_file: UploadFile = File(...), media_file: UploadFile = File(...),
+    transcriber_backend: Literal["local", "modal"] = Query(default="modal", description="Backend to run transcriber" )
 ):
     try:
         media_file_bytes = await media_file.read()
@@ -98,7 +99,10 @@ async def align_paragraphs_with_audio(
             )
 
         # Create pipeline
-        pipeline = get_pipeline()
+        transcriber_type = TranscriberType.MODAL_WHISPER if transcriber_backend == "modal" else TranscriberType.FASTER_WHISPER
+        pipeline = get_pipeline(
+            transcriber_type=transcriber_type
+            ) 
 
         # Align paragraphs with audio
         result = pipeline.get_paragraphs_timestamp(
