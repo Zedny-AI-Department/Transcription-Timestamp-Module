@@ -1,6 +1,8 @@
 from typing import BinaryIO, List, Union
 import uuid
 import modal
+from dotenv import load_dotenv
+import os
 
 from src.models import (
     SegmentTranscriptionModel,
@@ -9,6 +11,11 @@ from src.models import (
 )
 from src.core.interface.transcriber_interface import TranscriberInterface
 from src.utils import compress_bytes
+
+
+# Load variables from .env file
+load_dotenv()
+
 
 class ModalFasterWhisperTranscriber(TranscriberInterface):
     """
@@ -20,7 +27,8 @@ class ModalFasterWhisperTranscriber(TranscriberInterface):
         Initializes the faster-whisper locally with the given model name, .
         """
         self.modal_faster_whisper_transcriber_class = modal.Cls.from_name(
-            "timestamp_app", "ModalWhisperTranscriber"
+            os.environ.get("MODAL_APP_NAME"),
+            os.environ.get("MODAL_CLASS_NAME"),
         )
         self.model = self.modal_faster_whisper_transcriber_class()
 

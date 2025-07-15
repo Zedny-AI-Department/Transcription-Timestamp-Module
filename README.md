@@ -83,12 +83,14 @@ src/
     ```bash
     MODAL_TOKEN_ID=****
     MODAL_TOKEN_SECRET=****
+    MODAL_APP_NAME="***"
+    MODAL_CLASS_NAME="***"
     ```
 
 ----
 ### Running the Application
 
-1. Deploy modal app on modal:
+1. Deploy modal app on modal (Optional: if you have deployed it skip this step):
 
     ```bash
     modal deploy src/modal_class/modal_whisper_transcription.py 
