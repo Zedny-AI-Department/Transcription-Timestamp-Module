@@ -18,3 +18,5 @@ moviepy==2.2.1
 pillow==11.3.0
 proglog==0.1.12
 python-magic==0.4.27
+fuzzywuzzy==0.18.0
+modal==1.0.5
