@@ -4,6 +4,7 @@ import os
 import tempfile
 from typing import BinaryIO
 from moviepy import VideoFileClip
+import zstandard as zstd
 
 
 async def convert_video_to_audio(video_bytes: Bytes, video_name: str) -> BinaryIO:
@@ -36,7 +37,35 @@ async def convert_video_to_audio(video_bytes: Bytes, video_name: str) -> BinaryI
         # Cleanup temporary files
         os.remove(temp_audio_path)
         os.remove(temp_video_path)
-        
+
         return audio_binary
     except Exception as e:
         raise Exception(f"An error occurred while converting video to audio: {e}")
+
+
+def compress_bytes(data: bytes) -> bytes:
+    """
+    Compresses a byte array using the zlib library.
+
+    Args:
+        data (bytes): The byte array to compress.
+
+    Returns:
+        bytes: The compressed byte array.
+    """
+    compressor = zstd.ZstdCompressor()
+    return compressor.compress(data)
+
+
+def decompress_bytes(compressed_data: bytes) -> bytes:
+    """
+    Decompresses a byte array using the zlib library.
+
+    Args:
+        compressed_data (bytes): The compressed byte array to decompress.
+
+    Returns:
+        bytes: The decompressed byte array.
+    """
+    decompressor = zstd.ZstdDecompressor()
+    return decompressor.decompress(compressed_data)

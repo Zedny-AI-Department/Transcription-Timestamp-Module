@@ -2,9 +2,14 @@ import io
 import modal
 
 from src.config.modal_app import faster_whisper_image, app
+from src.utils import decompress_bytes
 
 
-@app.cls(image=faster_whisper_image, gpu="T4", timeout=1000)
+@app.cls(
+    image=faster_whisper_image,
+    gpu="T4",
+    timeout=1000,
+)
 class ModalWhisperTranscriber:
     """
     ModalWhisperTranscriber is a class for transcribing audio using the faster-whisper model within a Modal environment.
@@ -18,7 +23,6 @@ class ModalWhisperTranscriber:
     @modal.enter()
     def enter(self):
         from faster_whisper import WhisperModel
-
         self.model = WhisperModel("large-v3", compute_type="float32", device="cuda")
 
     @modal.method(is_generator=True)
@@ -34,7 +38,8 @@ class ModalWhisperTranscriber:
             ValueError: If the provided audio file is empty.
         """
         # Convert bytes back to BytesIO for faster-whisper
-        audio_file = io.BytesIO(audio_bytes)
+        decompressed_audio_bytes = decompress_bytes(audio_bytes)
+        audio_file = io.BytesIO(decompressed_audio_bytes)
         if not audio_file:
             raise ValueError("Audio file is empty")
         segments, info = self.model.transcribe(audio_file, **kwargs)

@@ -8,7 +8,7 @@ from src.models import (
     WordTranscriptionModel,
 )
 from src.core.interface.transcriber_interface import TranscriberInterface
-
+from src.utils import compress_bytes
 
 class ModalFasterWhisperTranscriber(TranscriberInterface):
     """
@@ -39,19 +39,15 @@ class ModalFasterWhisperTranscriber(TranscriberInterface):
 
             # Read bytes from audio_path
             if isinstance(audio_path, str):
-                # It's a file path string
                 with open(audio_path, "rb") as f:
                     audio_bytes = f.read()
-
             else:
-                # It's a BinaryIO object (file-like)
-                # Go to beginning and read all bytes
                 audio_path.seek(0)
                 audio_bytes = audio_path.read()
-                # Restore original position (optional, depends on your use case)
-                audio_path.seek(0)
+
+            compressed_bytes = compress_bytes(data=audio_bytes)
             segments = self.model.transcribe.remote_gen(
-                audio_bytes=audio_bytes,
+                audio_bytes=compressed_bytes,
                 word_timestamps=False,
                 **kwargs,
             )
@@ -82,19 +78,16 @@ class ModalFasterWhisperTranscriber(TranscriberInterface):
         try:
             # Read bytes from audio_path
             if isinstance(audio_path, str):
-                # It's a file path string
                 with open(audio_path, "rb") as f:
                     audio_bytes = f.read()
-
             else:
-                # It's a BinaryIO object (file-like)
                 # Go to beginning and read all bytes
                 audio_path.seek(0)
                 audio_bytes = audio_path.read()
-                # Restore original position (optional, depends on your use case)
-                audio_path.seek(0)
+
+            compressed_bytes = compress_bytes(data=audio_bytes)
             segments = self.model.transcribe.remote_gen(
-                audio_bytes=audio_bytes,
+                audio_bytes=compressed_bytes,
                 word_timestamps=True,
                 **kwargs,
             )

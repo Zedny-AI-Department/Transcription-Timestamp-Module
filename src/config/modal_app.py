@@ -6,7 +6,7 @@ faster_whisper_image = (
     )
     .env({"DEBIAN_FRONTEND": "noninteractive"})
     .copy_local_dir(local_path="src", remote_path="/root/src")
-    .apt_install("tzdata", "ffmpeg", "git")
+    .apt_install("tzdata", "ffmpeg", "git", "libmagic1", "libmagic-dev")
     .pip_install(
         "faster-whisper==1.1.1",
         "torch==2.0.1+cu118",
@@ -32,6 +32,7 @@ faster_whisper_image = (
         "proglog==0.1.12",
         "python-magic==0.4.27",
         "fuzzywuzzy==0.18.0",
+        "zstandard==0.23.0",
         extra_index_url="https://download.pytorch.org/whl/cu118",
     )
 )

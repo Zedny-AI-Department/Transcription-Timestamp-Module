@@ -1,2 +1,8 @@
-from .video_to_audio_util import convert_video_to_audio
+from .video_to_audio_util import convert_video_to_audio, compress_bytes, decompress_bytes
 from .detect_file_type_util import detect_file_type
+
+__all__ = [
+    "convert_video_to_audio",
+    "compress_bytes",
+    "decompress_bytes",
+]
