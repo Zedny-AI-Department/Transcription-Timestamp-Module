@@ -2,7 +2,7 @@ import io
 import modal
 
 from src.config.modal_app import faster_whisper_image, app
-from src.utils import decompress_bytes
+from src.utils.video_compression_util import decompress_bytes
 
 
 @app.cls(
@@ -23,7 +23,7 @@ class ModalWhisperTranscriber:
     @modal.enter()
     def enter(self):
         from faster_whisper import WhisperModel
-        self.model = WhisperModel("large-v3", compute_type="float32", device="cuda")
+        self.model = WhisperModel("large-v3")  # compute_type="float32", device="cuda"
 
     @modal.method(is_generator=True)
     def transcribe(self, audio_bytes: bytes, **kwargs):

@@ -1,4 +1,3 @@
-from ast import Bytes
 import io
 import os
 import tempfile
@@ -7,7 +6,7 @@ from moviepy import VideoFileClip
 import zstandard as zstd
 
 
-async def convert_video_to_audio(video_bytes: Bytes, video_name: str) -> BinaryIO:
+async def convert_video_to_audio(video_bytes: bytes, video_name: str) -> BinaryIO:
     """
     Converts a video file to an audio file. 
 
