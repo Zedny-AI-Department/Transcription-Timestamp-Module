@@ -19,7 +19,7 @@ class FasterWhisperTranscriber(TranscriberInterface):
         """
         Initializes the faster-whisper locally with the given model name, .
         """
-        self.client = WhisperModel(model_name, device="cpu", **kwargs)
+        self.client = WhisperModel(model_name, device="auto", **kwargs)
 
     def transcribe_segments_timestamp(
         self, audio_path: Union[BinaryIO, str], **kwargs
