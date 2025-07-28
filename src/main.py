@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.api.paragraph_timestamp_route import paragraph_timestamp_router
+from timestamp_whisper.api.paragraph_timestamp_route import paragraph_timestamp_router
 
 
 app = FastAPI()

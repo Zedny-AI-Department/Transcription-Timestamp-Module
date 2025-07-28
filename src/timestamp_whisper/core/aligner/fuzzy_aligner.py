@@ -1,11 +1,11 @@
 from typing import List
 from Levenshtein import ratio
 
-from src.core.types import DEFAULT_SEARCH_SEGMENT_SIZE
-from src.core import AlignerInterface
-from src.models import MatchChunk
-from src.models import TranscribedChunk, SegmentTranscriptionModel, WordTranscriptionModel
-from src.models import ParagraphAlignment
+from timestamp_whisper.core.types import DEFAULT_SEARCH_SEGMENT_SIZE
+from timestamp_whisper.core import AlignerInterface
+from timestamp_whisper.models import MatchChunk
+from timestamp_whisper.models import TranscribedChunk, SegmentTranscriptionModel, WordTranscriptionModel
+from timestamp_whisper.models import ParagraphAlignment
 
 
 class FuzzyAligner(AlignerInterface):

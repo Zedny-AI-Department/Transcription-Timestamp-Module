@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import BinaryIO, List, Union
 
-from src.models import SegmentTranscriptionModel, SegmentTranscriptionModelWithWords
+from timestamp_whisper.models import SegmentTranscriptionModel, SegmentTranscriptionModelWithWords
 
 
 class TranscriberInterface(ABC):

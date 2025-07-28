@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from src.models import SegmentTranscriptionModel, WordTranscriptionModel
-from src.models.aligner_models import ParagraphAlignment
+from timestamp_whisper.models import SegmentTranscriptionModel, WordTranscriptionModel
+from timestamp_whisper.models.aligner_models import ParagraphAlignment
 
 
 class AlignerInterface(ABC):

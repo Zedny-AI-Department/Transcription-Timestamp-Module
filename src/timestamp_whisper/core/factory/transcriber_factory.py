@@ -1,9 +1,9 @@
 import os
 from dotenv import load_dotenv
 
-from src.core import TranscriberInterface
-from src.core.types import TranscriberType
-from src.core.transcriber import FasterWhisperTranscriber, ModalFasterWhisperTranscriber
+from timestamp_whisper.core import TranscriberInterface
+from timestamp_whisper.core.types import TranscriberType
+from timestamp_whisper.core.transcriber import FasterWhisperTranscriber, ModalFasterWhisperTranscriber
 
 # Load environment variables from .env file
 load_dotenv()

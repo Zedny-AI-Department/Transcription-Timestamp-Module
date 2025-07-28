@@ -1,8 +1,8 @@
 import io
 import modal
 
-from src.config.modal_app import faster_whisper_image, app
-from src.utils.video_compression_util import decompress_bytes
+from timestamp_whisper.config.modal_app import faster_whisper_image, app
+from timestamp_whisper.utils.video_compression_util import decompress_bytes
 
 
 @app.cls(

@@ -4,13 +4,13 @@ import modal
 from dotenv import load_dotenv
 import os
 
-from src.models import (
+from timestamp_whisper.models import (
     SegmentTranscriptionModel,
     SegmentTranscriptionModelWithWords,
     WordTranscriptionModel,
 )
-from src.core.interface.transcriber_interface import TranscriberInterface
-from src.utils import compress_bytes
+from timestamp_whisper.core.interface.transcriber_interface import TranscriberInterface
+from timestamp_whisper.utils import compress_bytes
 
 
 # Load variables from .env file

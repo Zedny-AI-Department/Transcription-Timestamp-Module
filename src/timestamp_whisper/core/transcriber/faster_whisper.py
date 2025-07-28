@@ -2,12 +2,12 @@ from typing import BinaryIO, List, Union
 import uuid
 from faster_whisper import WhisperModel
 
-from src.models import (
+from timestamp_whisper.models import (
     SegmentTranscriptionModel,
     SegmentTranscriptionModelWithWords,
     WordTranscriptionModel,
 )
-from src.core.interface.transcriber_interface import TranscriberInterface
+from timestamp_whisper.core.interface.transcriber_interface import TranscriberInterface
 
 
 class FasterWhisperTranscriber(TranscriberInterface):

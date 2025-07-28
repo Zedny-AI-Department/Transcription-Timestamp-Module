@@ -4,12 +4,12 @@ from typing import List, Literal, Optional
 from fastapi import APIRouter, File, Query, UploadFile, HTTPException
 from pydantic import BaseModel, Field
 
-from src.core.types import FasterWhisperModel, TranscriberType, AlignerType
-from src.core.factory.aligner_factory import AlignerFactory
-from src.core.factory.transcriber_factory import TranscriberFactory
-from src.models.aligner_models import ParagraphAlignment
-from src.services import FileChunksTimestampService
-from src.utils import convert_video_to_audio, detect_file_type
+from timestamp_whisper.core.types import FasterWhisperModel, TranscriberType, AlignerType
+from timestamp_whisper.core.factory.aligner_factory import AlignerFactory
+from timestamp_whisper.core.factory.transcriber_factory import TranscriberFactory
+from timestamp_whisper.models.aligner_models import ParagraphAlignment
+from timestamp_whisper.services import FileChunksTimestampService
+from timestamp_whisper.utils import convert_video_to_audio, detect_file_type
 
 
 paragraph_timestamp_router = APIRouter()

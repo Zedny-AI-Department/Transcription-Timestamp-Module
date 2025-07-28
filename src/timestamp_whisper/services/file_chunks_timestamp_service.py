@@ -1,7 +1,7 @@
 from typing import BinaryIO, List, Union
 
-from src.core import TranscriberInterface, AlignerInterface
-from src.models import ParagraphAlignment
+from timestamp_whisper.core import TranscriberInterface, AlignerInterface
+from timestamp_whisper.models import ParagraphAlignment
 
 
 class FileChunksTimestampService:

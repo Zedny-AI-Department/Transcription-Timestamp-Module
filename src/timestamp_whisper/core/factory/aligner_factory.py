@@ -1,6 +1,6 @@
-from src.core import AlignerInterface
-from src.core.types import AlignerType
-from src.core.aligner import FuzzyAligner, FuzzyWuzzyAligner
+from timestamp_whisper.core import AlignerInterface
+from timestamp_whisper.core.types import AlignerType
+from timestamp_whisper.core.aligner import FuzzyAligner, FuzzyWuzzyAligner
 
 
 class AlignerFactory:

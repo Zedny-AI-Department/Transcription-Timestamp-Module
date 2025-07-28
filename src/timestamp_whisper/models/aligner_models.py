@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from src.models import TranscribedChunk
+from timestamp_whisper.models import TranscribedChunk
 
 
 class MatchChunk(TranscribedChunk):
