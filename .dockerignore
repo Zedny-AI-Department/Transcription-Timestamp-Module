@@ -1,0 +1,17 @@
+test/
+zedny_test_videos/
+__pycache__/
+*/__pycache__/
+
+.venv/
+*.log
+*.lock
+.git
+.gitignore
+.env
+.env.example
+
+**/*.pyc
+
+src/config/
+src/modal_class/
