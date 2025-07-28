@@ -1,7 +1,7 @@
 [project]
-name = "timestamp-whisper"
+name = "timestamp_whisper"
 version = "0.1.0"
-description = "A Python package for timestamping audio transcriptions using Whisper."
+description = "A Python package for timestamp audio transcriptions using Whisper."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
