@@ -21,7 +21,8 @@ class FuzzyWuzzyAligner(AlignerInterface):
         pass
 
     def align_paragraph_with_segments(
-        self, paragraph: str, segments: List[SegmentTranscriptionModel]
+        self, paragraph: str, segments: List[SegmentTranscriptionModel],
+        search_length: int = DEFAULT_SEARCH_SEGMENT_SIZE
     ) -> ParagraphAlignment:
         """
         Align the given paragraph with audio segments timestamp.
@@ -39,11 +40,12 @@ class FuzzyWuzzyAligner(AlignerInterface):
             return None
 
         # Find the most similar segment to the paragraph start with fuzzy matching
-        paragraph_start = " ".join(paragraph.strip().split(" ")[:DEFAULT_SEARCH_SEGMENT_SIZE] if paragraph.strip() else "")
+        paragraph_start = " ".join(paragraph.strip().split(" ")[:search_length] if paragraph.strip() else "")
         start_match: MatchChunk = self._get_similar_segment(paragraph_start, segments)
 
         # Find the most similar segment to the paragraph end with fuzzy matching
-        paragraph_end = " ".join(paragraph.strip().split(" ")[-DEFAULT_SEARCH_SEGMENT_SIZE:] if paragraph.strip() else "")
+        paragraph_end = " ".join(paragraph.strip().split(
+            " ")[-search_length:] if paragraph.strip() else "")
         end_match: MatchChunk = self._get_similar_segment(paragraph_end, segments)
 
         # Return the alignment with start and end times

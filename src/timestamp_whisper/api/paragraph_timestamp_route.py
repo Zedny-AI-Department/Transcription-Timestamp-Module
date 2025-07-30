@@ -9,7 +9,8 @@ from timestamp_whisper.core.factory.aligner_factory import AlignerFactory
 from timestamp_whisper.core.factory.transcriber_factory import TranscriberFactory
 from timestamp_whisper.models.aligner_models import ParagraphAlignment
 from timestamp_whisper.services import FileChunksTimestampService
-from timestamp_whisper.utils import convert_video_to_audio, detect_file_type, read_url
+from timestamp_whisper.services.align_text_with_transcription import ParagraphAssAlimentService
+from timestamp_whisper.utils import convert_video_to_audio, detect_file_type, read_url, read_ass_file
 
 
 paragraph_timestamp_router = APIRouter()
@@ -138,7 +139,7 @@ async def align_paragraphs_with_audio(
         # Read media url
         media_data = read_url(url=req.media_url)
         binary_audio = io.BytesIO(media_data.content)
-
+        
         # Create pipeline
         transcriber_type = (
             TranscriberType.MODAL_WHISPER
@@ -150,6 +151,39 @@ async def align_paragraphs_with_audio(
         # Align paragraphs with audio
         result = pipeline.get_paragraphs_timestamp(
             paragraphs=req.paragraphs, audio=binary_audio
+        )
+        return ParagraphsAlignmentResponse(result=result)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"An error occurred while processing the request: {str(e)}",
+        )
+
+
+@paragraph_timestamp_router.post("/align/ass")
+async def align_paragraphs_with_audio(
+    paragraphs_file: UploadFile = File(...),
+    ass_file: UploadFile = File(...),
+):
+    try:
+        # Read ass file
+        ass_file_content = await ass_file.read()
+        ass_transcription_segments = read_ass_file(ass_file_content)
+
+        # Prepare paragraphs
+        paragraphs = await extract_paragraphs_from_json(paragraphs_file=paragraphs_file)
+        if not paragraphs:
+            raise HTTPException(
+                status_code=400, detail="No paragraphs found in the JSON file."
+            )
+        
+        # Create pipeline
+        aligner = AlignerFactory.get_aligner(aligner_type=AlignerType.FUZZYWUZZY_ALIGNER)
+        pipeline = ParagraphAssAlimentService(aligner=aligner)
+
+        # Align paragraphs with audio
+        result = pipeline.get_paragraphs_timestamp(
+            paragraphs=paragraphs, ass_segments=ass_transcription_segments
         )
         return ParagraphsAlignmentResponse(result=result)
     except Exception as e:
