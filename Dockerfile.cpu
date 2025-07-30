@@ -31,8 +31,8 @@ EXPOSE 7000
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7000"]
 
-# Set the application version as an argument
-ARG APP_VERSION
-ENV APP_VERSION=${APP_VERSION}
+# # Set the application version as an argument
+# ARG APP_VERSION
+# ENV APP_VERSION=${APP_VERSION}
 
-RUN echo "Building version $APP_VERSION"
+# RUN echo "Building version $APP_VERSION"
