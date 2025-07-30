@@ -9,7 +9,7 @@ from timestamp_whisper.core.factory.aligner_factory import AlignerFactory
 from timestamp_whisper.core.factory.transcriber_factory import TranscriberFactory
 from timestamp_whisper.models.aligner_models import ParagraphAlignment
 from timestamp_whisper.services import FileChunksTimestampService
-from timestamp_whisper.utils import convert_video_to_audio, detect_file_type
+from timestamp_whisper.utils import convert_video_to_audio, detect_file_type, read_url
 
 
 paragraph_timestamp_router = APIRouter()
@@ -66,8 +66,8 @@ class ParagraphsAlignmentResponse(BaseModel):
 
 # Endpoints
 
-
-@paragraph_timestamp_router.post("/align")
+# Align with video file 
+@paragraph_timestamp_router.post("/align/file")
 async def align_paragraphs_with_audio(
     paragraphs_file: UploadFile = File(...),
     media_file: UploadFile = File(...),
@@ -112,6 +112,44 @@ async def align_paragraphs_with_audio(
         # Align paragraphs with audio
         result = pipeline.get_paragraphs_timestamp(
             paragraphs=paragraphs, audio=binary_audio
+        )
+        return ParagraphsAlignmentResponse(result=result)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"An error occurred while processing the request: {str(e)}",
+        )
+
+
+# Align with video url 
+
+class VideoURLrequest(BaseModel):
+    media_url: str
+    paragraphs: list[str]
+    transcriber_backend: Optional[Literal["local", "modal"]] = Field(
+        default="modal", description="Backend to run transcriber")
+    
+
+@paragraph_timestamp_router.post("/align/url")
+async def align_paragraphs_with_audio(
+    req: VideoURLrequest
+):
+    try:
+        # Read media url
+        media_data = read_url(url=req.media_url)
+        binary_audio = io.BytesIO(media_data.content)
+
+        # Create pipeline
+        transcriber_type = (
+            TranscriberType.MODAL_WHISPER
+            if req.transcriber_backend == "modal"
+            else TranscriberType.FASTER_WHISPER
+        )
+        pipeline = get_pipeline(transcriber_type=transcriber_type)
+
+        # Align paragraphs with audio
+        result = pipeline.get_paragraphs_timestamp(
+            paragraphs=req.paragraphs, audio=binary_audio
         )
         return ParagraphsAlignmentResponse(result=result)
     except Exception as e:

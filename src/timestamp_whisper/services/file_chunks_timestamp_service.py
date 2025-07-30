@@ -22,7 +22,7 @@ class FileChunksTimestampService:
     def get_paragraphs_timestamp(
         self,
         paragraphs: List[str],
-        audio: Union[BinaryIO, str],
+        audio: BinaryIO,
     ) -> List[ParagraphAlignment]:
         """
         Get timestamps for paragraphs aligned with audio segments.
