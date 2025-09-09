@@ -137,9 +137,12 @@ async def align_paragraphs_with_audio(
 ):
     try:
         # Read media url
+        video_name = req.media_url.split("/")[-1]
         media_data = read_url(url=req.media_url)
-        binary_audio = io.BytesIO(media_data.content)
-        
+        binary_audio = await convert_video_to_audio(
+                video_bytes=media_data.content, video_name=video_name
+            )
+        binary_audio = io.BytesIO(binary_audio)
         # Create pipeline
         transcriber_type = (
             TranscriberType.MODAL_WHISPER

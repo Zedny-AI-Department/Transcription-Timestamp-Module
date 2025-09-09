@@ -27,7 +27,10 @@ def read_url(url: str) -> ReadURLResult:
     try:
         with requests.get(url, stream=True) as data:
             data.raise_for_status()
-            url_content = data.content
+            url_content = b""
+            for chunk in data.iter_content(chunk_size=8192):
+                if chunk:
+                    url_content += chunk
             url_content_type = data.headers.get('Content-Type', "")
             return ReadURLResult(content=url_content, content_type=url_content_type)
     except Exception as e:
