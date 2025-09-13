@@ -2,6 +2,7 @@ from typing import BinaryIO, List, Union
 
 from timestamp_whisper.core import TranscriberInterface, AlignerInterface
 from timestamp_whisper.models import ParagraphAlignment
+from timestamp_whisper.models.aligner_models import ParagraphAlignmentWithWords, ParagraphItem
 
 
 class FileChunksTimestampService:
@@ -21,7 +22,7 @@ class FileChunksTimestampService:
 
     def get_paragraphs_timestamp(
         self,
-        paragraphs: List[str],
+        paragraphs: List[ParagraphItem],
         audio: BinaryIO,
     ) -> List[ParagraphAlignment]:
         """
@@ -43,30 +44,32 @@ class FileChunksTimestampService:
                     vad_filter=True,
                     vad_parameters=dict(
                         threshold=0.3,
+                        min_speech_duration_ms=1000
                     ),
+                    chunk_length=3,
+
                 )
             )
-
             if not transcribed_segments_with_words:
                 return []
             paragraphs_timestamps = []
             for paragraph in paragraphs:
                 # Align the paragraph with audio segments timestamp
                 segment_alignment = self.aligner.align_paragraph_with_segments(
-                    paragraph, transcribed_segments_with_words.segments
+                    paragraph.text, transcribed_segments_with_words.segments, search_length=10
                 )
                 # Align the paragraph with audio words timestamp
                 if segment_alignment:
                     # Get the start word of the paragraph
-                    start_segment_words = [
+                    start_segments_words = [
                         word
                         for word in transcribed_segments_with_words.words
                         if str(word.segment_id)
-                        == str(segment_alignment.best_start_match.id)
+                        in [str(segment_alignment.best_start_match.id), str(int(segment_alignment.best_start_match.id) - 1)]
                     ]
                     paragraph_start_word = self.aligner.align_paragraph_with_words(
-                        paragraph=paragraph,
-                        words=start_segment_words,
+                        paragraph=paragraph.text,
+                        words=start_segments_words,
                     )
                     paragraph_start = (
                         paragraph_start_word
@@ -76,14 +79,14 @@ class FileChunksTimestampService:
                     )
 
                     # Get the start word of the paragraph
-                    end_segment_words = [
+                    end_segments_words = [
                         word
                         for word in transcribed_segments_with_words.words
                         if str(word.segment_id)
-                        == str(segment_alignment.best_end_match.id)
+                        in [str(segment_alignment.best_end_match.id), str(int(segment_alignment.best_end_match.id) +  1)]
                     ]
                     paragraph_end_word = self.aligner.align_paragraph_with_words(
-                        paragraph=paragraph, words=end_segment_words
+                        paragraph=paragraph.text, words=end_segments_words
                     )
                     paragraph_end = (
                         paragraph_end_word
@@ -91,14 +94,19 @@ class FileChunksTimestampService:
                         and paragraph_end_word.best_end_match.score > 0.5
                         else segment_alignment
                     )
+                    # Get paragraph words
+                    paragraph_words = [word for word in transcribed_segments_with_words.words if word.start >=
+                                       paragraph_start.start and word.end <= paragraph_end.end]
                     # Create a ParagraphAlignment object with the paragraph and its timestamps
                     paragraphs_timestamps.append(
-                        ParagraphAlignment(
-                            paragraph=paragraph,
+                        ParagraphAlignmentWithWords(
+                            paragraph=paragraph.text,
+                            paragraph_index=paragraph.paragraph_index,
                             start=paragraph_start.start,
                             end=paragraph_end.end,
                             best_start_match=paragraph_start.best_start_match,
                             best_end_match=paragraph_end.best_end_match,
+                            paragraph_words=paragraph_words,
                         )
                     )
 

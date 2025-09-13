@@ -1,13 +1,13 @@
 import io
 import json
 from typing import List, Literal, Optional
-from fastapi import APIRouter, File, Query, UploadFile, HTTPException
+from fastapi import APIRouter, File, Form, Query, UploadFile, HTTPException
 from pydantic import BaseModel, Field
 
 from timestamp_whisper.core.types import FasterWhisperModel, TranscriberType, AlignerType
 from timestamp_whisper.core.factory.aligner_factory import AlignerFactory
 from timestamp_whisper.core.factory.transcriber_factory import TranscriberFactory
-from timestamp_whisper.models.aligner_models import ParagraphAlignment
+from timestamp_whisper.models.aligner_models import ParagraphAlignment, ParagraphAlignmentWithWords, ParagraphItem
 from timestamp_whisper.services import FileChunksTimestampService
 from timestamp_whisper.services.align_text_with_transcription import ParagraphAssAlimentService
 from timestamp_whisper.utils import convert_video_to_audio, detect_file_type, read_url, read_ass_file
@@ -56,21 +56,24 @@ async def extract_paragraphs_from_json(paragraphs_file: UploadFile):
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 
-# Response model
-
+# Schema definitions
 
 class ParagraphsAlignmentResponse(BaseModel):
-    result: List[ParagraphAlignment] = Field(
+    result: List[ParagraphAlignmentWithWords] = Field(
         description="List of aligned paragraphs with their timestamps."
     )
 
+class ParagraphRequestSchema(BaseModel):
+    paragraphs: List[ParagraphItem] = Field(
+        description="List of paragraphs to align."
+    )
 
 # Endpoints
 
-# Align with video file 
+# Align with video file
 @paragraph_timestamp_router.post("/align/file")
 async def align_paragraphs_with_audio(
-    paragraphs_file: UploadFile = File(...),
+   paragraphs_data: str = Form(..., description="JSON string containing paragraphs list"),
     media_file: UploadFile = File(...),
     transcriber_backend: Literal["local", "modal"] = Query(
         default="modal", description="Backend to run transcriber"
@@ -96,7 +99,9 @@ async def align_paragraphs_with_audio(
             binary_audio = io.BytesIO(media_file_bytes)
 
         # Prepare paragraphs
-        paragraphs = await extract_paragraphs_from_json(paragraphs_file=paragraphs_file)
+        paragraphs_dict = json.loads(paragraphs_data)
+        paragraphs = ParagraphRequestSchema(**paragraphs_dict)
+
         if not paragraphs:
             raise HTTPException(
                 status_code=400, detail="No paragraphs found in the JSON file."
@@ -112,7 +117,7 @@ async def align_paragraphs_with_audio(
 
         # Align paragraphs with audio
         result = pipeline.get_paragraphs_timestamp(
-            paragraphs=paragraphs, audio=binary_audio
+            paragraphs=paragraphs.paragraphs, audio=binary_audio
         )
         return ParagraphsAlignmentResponse(result=result)
     except Exception as e:
@@ -122,14 +127,14 @@ async def align_paragraphs_with_audio(
         )
 
 
-# Align with video url 
+# Align with video url
 
 class VideoURLrequest(BaseModel):
     media_url: str
     paragraphs: list[str]
     transcriber_backend: Optional[Literal["local", "modal"]] = Field(
         default="modal", description="Backend to run transcriber")
-    
+
 
 @paragraph_timestamp_router.post("/align/url")
 async def align_paragraphs_with_audio(

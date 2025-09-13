@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
+from timestamp_whisper.core.types import DEFAULT_SEARCH_SEGMENT_SIZE
 from timestamp_whisper.models import SegmentTranscriptionModel, WordTranscriptionModel
 from timestamp_whisper.models.aligner_models import ParagraphAlignment
 
@@ -12,7 +13,7 @@ class AlignerInterface(ABC):
 
     @abstractmethod
     def align_paragraph_with_segments(
-        self, paragraph: str, segments: List[SegmentTranscriptionModel], search_length: int = 10,  **kwargs
+        self, paragraph: str, segments: List[SegmentTranscriptionModel], search_length: int = DEFAULT_SEARCH_SEGMENT_SIZE,  **kwargs
     ) -> ParagraphAlignment:
         """
         Align the given paragraph with audio segments timestamp.

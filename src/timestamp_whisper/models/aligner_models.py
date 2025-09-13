@@ -1,6 +1,8 @@
+from typing import List
 from pydantic import BaseModel, Field
 
 from timestamp_whisper.models import TranscribedChunk
+from timestamp_whisper.models.transcription_models import WordTranscriptionModel
 
 
 class MatchChunk(TranscribedChunk):
@@ -29,3 +31,22 @@ class ParagraphAlignment(BaseModel):
     best_end_match: MatchChunk = Field(
         ..., description="The best matching segment for the paragraph."
     )
+
+
+class ParagraphAlignmentWithWords(ParagraphAlignment):
+    """
+    Model representing the alignment of a paragraph with its start and end timestamps and words.
+    """
+    paragraph_words: List[WordTranscriptionModel] = Field(
+        ..., description="Words in the paragraph."
+    )
+    paragraph_index: int = Field(
+        ..., description="Index of the paragraph."
+    )
+
+
+class ParagraphItem(BaseModel):
+    text: str = Field(
+        description="Paragraph text."
+    )
+    paragraph_index: int
