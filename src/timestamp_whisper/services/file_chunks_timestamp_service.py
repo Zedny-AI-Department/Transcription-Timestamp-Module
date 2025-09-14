@@ -47,7 +47,6 @@ class FileChunksTimestampService:
                         min_speech_duration_ms=1000
                     ),
                     chunk_length=3,
-
                 )
             )
             if not transcribed_segments_with_words:
@@ -65,7 +64,7 @@ class FileChunksTimestampService:
                         word
                         for word in transcribed_segments_with_words.words
                         if str(word.segment_id)
-                        in [str(segment_alignment.best_start_match.id), str(int(segment_alignment.best_start_match.id) - 1)]
+                        in [str(segment_alignment.best_start_match.id), str(int(segment_alignment.best_start_match.id) - 1), str(int(segment_alignment.best_start_match.id) - 2)]
                     ]
                     paragraph_start_word = self.aligner.align_paragraph_with_words(
                         paragraph=paragraph.text,
@@ -83,7 +82,7 @@ class FileChunksTimestampService:
                         word
                         for word in transcribed_segments_with_words.words
                         if str(word.segment_id)
-                        in [str(segment_alignment.best_end_match.id), str(int(segment_alignment.best_end_match.id) +  1)]
+                        in [str(segment_alignment.best_end_match.id), str(int(segment_alignment.best_end_match.id) +  1), str(int(segment_alignment.best_end_match.id) +  2)]
                     ]
                     paragraph_end_word = self.aligner.align_paragraph_with_words(
                         paragraph=paragraph.text, words=end_segments_words
