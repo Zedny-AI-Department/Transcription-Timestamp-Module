@@ -13,7 +13,5 @@ __pycache__/
 
 **/*.pyc
 
-src/timestamp_whisper/config/
-src/timestamp_whisper/modal_class/
-
-docker_commands.txt
+src/config/
+src/modal_class/

@@ -23,8 +23,8 @@ jobs:
 
             - name: Build Docker image
               run: |
-                docker build -t ${{ secrets.DOCKER_USERNAME }}/timestamp-package-modal:latest -f Dockerfile.modal .
+                docker build -t ${{ secrets.DOCKER_USERNAME }}/timestamp-package-cpu:latest -f Dockerfile.cpu .
 
             - name: Push Docker image
               run: |
-                    docker push ${{ secrets.DOCKER_USERNAME }}/timestamp-package-modal:latest
+                    docker push ${{ secrets.DOCKER_USERNAME }}/timestamp-package-cpu:latest
