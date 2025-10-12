@@ -35,9 +35,10 @@ class FileChunksTimestampService:
             - List of ParagraphAlignment objects containing the start timestamps of each paragraph.
         """
         try:
+            print(1)
             if not paragraphs or not audio:
                 return []
-
+            print(paragraphs)
             transcribed_segments_with_words = (
                 self.transcriber.transcribe_segments_with_words_timestamp(
                     audio_path=audio,
@@ -47,8 +48,14 @@ class FileChunksTimestampService:
                         min_speech_duration_ms=1000
                     ),
                     chunk_length=3,
+                    beam_size=5,  # Use beam search instead of sampling
+                    best_of=5,    # Number of candidates when using sampling
+                    temperature=0.0,  # Disable sampling randomness
                 )
             )
+            print(f"segments: {transcribed_segments_with_words.segments}")
+            print("----------")
+            print(f"words: {transcribed_segments_with_words.words}")
             if not transcribed_segments_with_words:
                 return []
             paragraphs_timestamps = []
@@ -57,6 +64,8 @@ class FileChunksTimestampService:
                 segment_alignment = self.aligner.align_paragraph_with_segments(
                     paragraph.text, transcribed_segments_with_words.segments, search_length=10
                 )
+                print("------")
+                print(f"segment_alignment: {segment_alignment}")
                 # Align the paragraph with audio words timestamp
                 if segment_alignment:
                     # Get the start word of the paragraph

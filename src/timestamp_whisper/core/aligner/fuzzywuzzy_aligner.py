@@ -117,9 +117,9 @@ class FuzzyWuzzyAligner(AlignerInterface):
                 partial_score = fuzz.partial_ratio(
                     self._clean_text(segment.text).lower().strip(), self._clean_text(search_sentence).lower().strip())
                 token_set_score = fuzz.token_set_ratio(self._clean_text(segment.text).lower().strip(), self._clean_text(search_sentence).lower().strip())
-                composite_score = (partial_score * 0.5 + 
-                  ratio_score * 0.3 + 
-                  token_set_score * 0.2)
+                composite_score = (partial_score * 0.6 + 
+                  ratio_score * 0.1 + 
+                  token_set_score * 0.3)
 
                 if max_score == 0 or composite_score > max_score:
                     max_score = composite_score

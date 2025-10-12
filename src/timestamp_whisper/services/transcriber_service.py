@@ -34,6 +34,10 @@ class TranscriberService:
                     vad_parameters=dict(
                         threshold=0.3,
                     ),
+                    chunk_length=3,
+                    beam_size=5,  # Use beam search instead of sampling
+                    best_of=5,    # Number of candidates when using sampling
+                    temperature=0.0,  # Disable sampling randomness
                 )
             )
 
